@@ -1,0 +1,28 @@
+{
+  "name": "@pagopa/pagopa-gps-donation-service",
+  "description": "Donation Service",
+  "author": "pagoPa tech",
+  "repository": "https://github.com/pagopa/pagopa-gps-donation-service",
+  "version": "1.0.0",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc",
+    "build:production": "npm run prestart && npm prune --production",
+    "watch": "tsc --w",
+    "prestart": "npm run build && func extensions install",
+    "start:host": "func start",
+    "start": "npm-run-all --parallel start:host watch",
+    "test": "echo \"No tests yet...\""
+  },
+  "dependencies": {
+    "@azure/functions": "^3.2.0",
+    "shx": "^0.3.4",
+    "typescript": "^4.7.4"
+  },
+  "devDependencies": {
+    "dependency-check": "^4.1.0",
+    "shx": "^0.3.3",
+    "dotenv-cli": "^3.1.0",
+    "npm-run-all": "^4.1.5"
+  }
+}
