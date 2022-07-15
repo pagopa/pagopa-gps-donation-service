@@ -1,5 +1,7 @@
 import {AzureFunction, Context, HttpRequest} from "@azure/functions"
 
+
+
 // POST http://localhost:7071/api/Donation
 const httpTrigger: AzureFunction = async function (context: Context, req: HttpRequest): Promise<void> {
     context.log('HTTP trigger function processed a request.', req.body);
@@ -12,10 +14,12 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
                 amount: properties.amount,
                 description: properties.description,
                 isPartialPayment: false,
-                dueDate: "2022-03-16T09:30:42.577", // TODO
-                retentionDate: "2022-05-15T08:30:42.577", // TODO
+                dueDate: addDays(new Date(), Number(process.env['ADD_DUE_DATE_DAYS'])),
+                retentionDate: addDays(new Date(), Number(process.env['ADD_RETENTION_DATE_DAYS'])),
                 fee: 0,
-                transfer: []
+                transfer: [{
+                    amount: properties.amount
+                }]
             }
         ]
     }
@@ -28,5 +32,10 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
     };
 
 };
+
+function addDays(date: Date, days: number): Date {
+    date.setDate(date.getDate() + days);
+    return date;
+}
 
 export default httpTrigger;
