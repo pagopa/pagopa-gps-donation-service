@@ -10,10 +10,24 @@
 # https://docs.microsoft.com/en-us/azure/devops/pipelines/yaml-schema?view=azure-devops&tabs=schema%2Cparameter-schema#pr-trigger
 trigger: none
 
+
+variables:
+  NODE_VERSION: '14.19.0'
+  YARN_CACHE_FOLDER: $(Pipeline.Workspace)/.yarn
+
+
 # Execute agents (jobs) on latest Ubuntu version.
-# To change OS for a specific, ovverride "pool" attribute inside the job definition
+# To change OS for a specific, override "pool" attribute inside the job definition
 pool:
   vmImage: 'ubuntu-latest'
+
+resources:
+  repositories:
+    - repository: pagopaCommons
+      type: github
+      name: pagopa/azure-pipeline-templates
+      ref: refs/tags/v15
+      endpoint: 'io-azure-devops-github-ro'
 
 
 stages:
@@ -21,9 +35,6 @@ stages:
     dependsOn: []
     jobs:
       - job: make_build
-        pool:
-          # As we deploy on Wondows machines, we use Windows to build
-          vmImage: 'windows-2019'
         steps:
           - template: templates/node-job-setup/template.yaml@pagopaCommons
           - script: |
@@ -40,20 +51,20 @@ stages:
               yarn lint
             displayName: 'Lint'
 
-      - job: danger
-        condition:
-          and(
-          succeeded(),
-          ne(variables['DANGER_GITHUB_API_TOKEN'], 'skip')
-          )
-        steps:
-          - template: templates/node-job-setup/template.yaml@pagopaCommons
-
-          - bash: |
-              yarn danger ci
-            env:
-              DANGER_GITHUB_API_TOKEN: '$(DANGER_GITHUB_API_TOKEN)'
-            displayName: 'Danger CI'
+#      - job: danger
+#        condition:
+#          and(
+#          succeeded(),
+#          ne(variables['DANGER_GITHUB_API_TOKEN'], 'skip')
+#          )
+#        steps:
+#          - template: templates/node-job-setup/template.yaml@pagopaCommons
+#
+#          - bash: |
+#              yarn danger ci
+#            env:
+#              DANGER_GITHUB_API_TOKEN: '$(DANGER_GITHUB_API_TOKEN)'
+#            displayName: 'Danger CI'
 
 
   # B) Run unit tests if there is a push or pull request on any branch.
@@ -72,6 +83,53 @@ stages:
               yarn test:coverage
             displayName: 'Unit tests exec'
 
-          - bash: |
-              bash <(curl -s https://codecov.io/bash)
-            displayName: 'Code coverage'
+  - stage: Sonarcloud
+      dependsOn: [ ]
+      jobs:
+        - job: sonarcloud_analysis
+          steps:
+            - template: templates/node-job-setup/template.yaml@pagopaCommons
+
+            - script: git branch
+              displayName: 'Branch identification'
+
+            - task: SonarCloudPrepare@1
+              displayName: 'Prepare SonarCloud analysis configuration'
+              inputs:
+                SonarCloud: '$(SONARCLOUD_SERVICE_CONN)'
+                organization: '$(SONARCLOUD_ORG)'
+                scannerMode: Other
+                projectKey: $(SONARCLOUD_PROJECT_KEY)
+                projectName: $(SONARCLOUD_PROJECT_NAME)
+                #              scannerMode: CLI
+                #              configMode: manual
+                #              cliProjectKey: $(SONARCLOUD_PROJECT_KEY)
+                #              cliProjectName: $(SONARCLOUD_PROJECT_NAME)
+                #              cliSources: $(Build.Repository.LocalPath)
+                extraProperties: |
+                  sonar.javascript.file.suffixes=.js,.jsx
+                  sonar.typescript.file.suffixes=.ts,.tsx
+                  sonar.sources=.
+                  sonar.exclusions=src/__tests__/**
+                  sonar.tests=src/__tests__
+                  sonar.test.inclusions=src/__tests__/**/*.test.tsx
+                  sonar.testExecutionReportPaths=test-report.xml
+                  sonar.sourceEncoding=UTF-8
+                  sonar.verbose=true
+                  sonar.javascript.lcov.reportPaths=coverage/lcov.info
+                  sonar.typescript.tsconfigPath=tsconfig.json
+                  sonar.eslint.reportPaths=eslint-report.json
+
+            - script: yarn test
+              displayName: 'Unit tests execution'
+
+            - script: yarn lint
+              displayName: 'Lint execution'
+
+            - task: SonarCloudAnalyze@1
+
+            - task: SonarCloudPublish@1
+              inputs:
+                pollingTimeoutSec: '300'
+              displayName: 'Publish SonarCloud results on build summary'
+
