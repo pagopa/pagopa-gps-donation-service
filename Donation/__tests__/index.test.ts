@@ -21,6 +21,20 @@ describe("feature donation", () => {
     });
 
 
+    it('wrong amount', async () => {
+        const req = {
+            properties: {
+                amount: -100,
+                description: "ukraine"
+            }
+        };
+        const result = await mockedRequestFactory(req);
+
+        expect(result.res.status).toEqual(400);
+        const body = result.res.body;
+        expect(body.title).toEqual("Bad Request");
+        expect(result.res.headers['Content-Type']).toEqual("application/json");
+    });
 });
 
 
