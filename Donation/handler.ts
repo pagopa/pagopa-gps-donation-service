@@ -19,11 +19,13 @@ export const Input = t.type({
 export const errorResponseFactory = (
   status: number,
   title: string,
-  detail: string
+  detail: string,
+  requestId: string
 ) => ({
   body: ProblemJson.encode({ detail, status, title }),
   headers: {
-    "Content-Type": "application/json"
+    "Content-Type": "application/json",
+    "X-Request-Id": requestId
   },
   status: 400
 });

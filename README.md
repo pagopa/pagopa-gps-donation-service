@@ -18,8 +18,8 @@ This service is called by [GPS](https://github.com/pagopa/pagopa-spontaneous-pay
 # How to run Locally 🚀
 Before to start locally: 
 - Create a `local.settings.json` file (👀 `local.settings.json.example`) 
-- Install dependencies: `npm install`
-- Then start the function:`npm start`
+- Install dependencies: `yarn install`
+- Then start the function:`yarn start`
 
 
 Use `/api-test/local-curl.sh` to try the HTTP function
@@ -29,7 +29,7 @@ Use `/api-test/local-curl.sh` to try the HTTP function
 To run the unit tests and get the coverage: 
 
 ```
-npm run test:coverage
+yarn test:coverage
 ```
 
 
