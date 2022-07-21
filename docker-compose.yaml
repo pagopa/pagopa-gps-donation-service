@@ -1,0 +1,12 @@
+version: "3.2"
+
+services:
+  donation:
+    container_name: 'gps-donation-service'
+    ports:
+      - "7071:7071"
+    build:
+      context: ./
+      dockerfile: Dockerfile
+
+
