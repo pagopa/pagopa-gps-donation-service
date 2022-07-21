@@ -14,7 +14,7 @@ parameters:
       - major
       - minor
       - patch
-      - buildNumber
+      - prerelease
       - skip
     default: skip
   - name: TEST

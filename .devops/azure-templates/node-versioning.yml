@@ -11,6 +11,7 @@ parameters:
       - major
       - minor
       - patch
+      - prerelease
       - skip
 
   # This is the branch in which we will push the release tag.
