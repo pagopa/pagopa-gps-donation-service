@@ -23,6 +23,9 @@ parameters:
     default: false
 
 variables:
+  NODE_VERSION: '14.19.0'
+  YARN_CACHE_FOLDER: $(Pipeline.Workspace)/.yarn
+
   ${{ if eq(parameters['ENV'], 'dev') }}:
     AZURE_SUBSCRIPTION: $(DEV_AZURE_SUBSCRIPTION)
     RESOURCE_GROUP: $(DEV_WEB_APP_RESOURCE_GROUP_NAME)
@@ -52,10 +55,6 @@ variables:
   ${{ if ne(variables['Build.SourceBranchName'], 'merge') }}:
     SOURCE_BRANCH: ${{ variables['Build.SourceBranchName'] }}
 
-
-
-  MAVEN_CACHE_FOLDER: $(Pipeline.Workspace)/.m2/repository
-  MAVEN_OPTS: "-Dmaven.repo.local=$(MAVEN_CACHE_FOLDER)"
   title: ""
   sha: ""
   tag: ""
@@ -67,10 +66,19 @@ pr: none
 pool:
   vmImage: ubuntu-latest
 
+resources:
+  repositories:
+    - repository: pagopaCommons
+      type: github
+      name: pagopa/azure-pipeline-templates
+      ref: refs/tags/v18
+      endpoint: 'io-azure-devops-github-ro'
+
 stages:
 
   # Create a release on GitHub
   - stage: release_service
+    # bump version if SEMVER is not 'skip'
     condition: ne('${{ parameters.SEMVER }}', 'skip')
     pool:
       vmImage: "ubuntu-latest"
