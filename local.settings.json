@@ -1,9 +1,0 @@
-{
-  "IsEncrypted": false,
-  "Values": {
-    "FUNCTIONS_WORKER_RUNTIME": "node",
-    "AzureWebJobsStorage": "",
-    "ADD_DUE_DATE_DAYS": 15,
-    "ADD_RETENTION_DATE_DAYS": 15
-  }
-}
