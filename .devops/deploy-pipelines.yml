@@ -42,7 +42,7 @@ variables:
     SOURCE_BRANCH: ${{ variables['Build.SourceBranchName'] }}
 
   # Image Repository Name
-  imageRepository: '$(IMAGE_REPOSITORY_NAME)'
+  imageRepository: '$(IMAGE_REPOSITORY)'
   nameSpace: '$(K8S_NAMESPACE)'
 
   title: ""
