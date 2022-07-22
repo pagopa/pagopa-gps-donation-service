@@ -148,7 +148,7 @@ stages:
   # Deploy on K8s with Helm
   - stage: 'Serving_helm'
     displayName: 'Serving_Helm'
-    dependsOn: Build
+    dependsOn: prepare_artifact
     condition: or(succeeded(), ne('${{ parameters.SEMVER }}', 'skip') )
     jobs:
       - job: Serving_helm
