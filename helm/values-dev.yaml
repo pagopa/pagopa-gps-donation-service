@@ -10,16 +10,16 @@ microservice-chart:
 
   livenessProbe:
     httpGet:
-      path: /actuator/health/liveness
-      port: 8080
+      path: /api/Info
+      port: 7071
     initialDelaySeconds: 90
     failureThreshold: 6
     periodSeconds: 10
 
   readinessProbe:
     httpGet:
-      path: /actuator/health/readiness
-      port: 8080
+      path: /api/Info
+      port: 7071
     initialDelaySeconds: 90
     failureThreshold: 6
     periodSeconds: 10
@@ -30,7 +30,7 @@ microservice-chart:
   service:
     create: true
     type: ClusterIP
-    port: 8080
+    port: 7071
 
   ingress:
     create: true

@@ -58,6 +58,7 @@ variables:
   title: ""
   sha: ""
   tag: ""
+  version: ""
 
 # Only manual triggers
 trigger: none
@@ -105,49 +106,101 @@ stages:
 
 
   # Prepare Artifact with application bundle
-#  - stage: prepare_artifact
-#    condition: not(failed('release_service'))
-#    pool:
-#      vmImage: 'ubuntu-latest'
-#    jobs:
-#      - job: 'make_build'
-#        steps:
-#          # Build application
-#          - template: templates/node-job-setup/template.yaml@pagopaCommons
-#            parameters:
-#              # On the assumption that this stage is executed only when Release stage is,
-#              #  with this parameter we set the reference the deploy script must pull changes from.
-#              # The branch/tag name is calculated from the source branch
-#              #  ex: Build.SourceBranch=refs/heads/master --> master
-#              #  ex: Build.SourceBranch=refs/tags/v1.2.3-RELEASE --> v1.2.3-RELEASE
-#              gitReference: ${{ replace(replace(variables['Build.SourceBranch'], 'refs/tags/', ''), 'refs/heads/', '') }}
-#
-#          - script: yarn test
-#            displayName: 'Test'
-#
-#          - script: yarn build
-#            displayName: 'Build'
-#
-#          - task: Docker@2
-#            displayName: Build and push an image to container registry
-#            inputs:
-#              containerRegistry: '$(dockerRegistryServiceConnection)'
-#              repository: '$(IMAGE_REPOSITORY)'
-#              command: 'buildAndPush'
-#              tags: |
-#                $(Build.BuildId)
-#                latest
-#                $(pomversion.next)
-#
-#          # deploy project-fn
-#          - task: AzureFunctionAppContainer@1
-#            displayName: Deploy Function App [DEV]
-#            inputs:
-#              azureSubscription: $(AZURE_SUBSCRIPTION)
-#              appName: "${{variables.DEV_WEB_APP_NAME}}-fn-donation"
-#              imageName: "${{variables.DEV_CONTAINER_NAMESPACE}}/iuv-generator:$(Build.BuildId)"
-#              slotName: production
-#
-#          - script: |
-#              echo "##vso[task.setvariable variable=version;isOutput=true]$(pomversion.next)"
-#            name: dockerTag
+  - stage: prepare_artifact
+    condition: not(failed('release_service'))
+    pool:
+      vmImage: 'ubuntu-latest'
+    jobs:
+      - job: 'make_build'
+        steps:
+          # Build application
+          - template: templates/node-job-setup/template.yaml@pagopaCommons
+            parameters:
+              # On the assumption that this stage is executed only when Release stage is,
+              #  with this parameter we set the reference the deploy script must pull changes from.
+              # The branch/tag name is calculated from the source branch
+              #  ex: Build.SourceBranch=refs/heads/master --> master
+              #  ex: Build.SourceBranch=refs/tags/v1.2.3-RELEASE --> v1.2.3-RELEASE
+              gitReference: ${{ replace(replace(variables['Build.SourceBranch'], 'refs/tags/', ''), 'refs/heads/', '') }}
+
+          - script: yarn test
+            displayName: 'Test'
+
+          - script: yarn build
+            displayName: 'Build'
+
+          - script: |
+              VERSION=$(node -p "require('./package.json').version")
+              echo "##vso[task.setvariable variable=version]VERSION"
+            displayName: 'Get Version'
+
+          - task: Docker@2
+            displayName: Build and push an image to container registry
+            inputs:
+              containerRegistry: '$(dockerRegistryServiceConnection)'
+              repository: '$(IMAGE_REPOSITORY)'
+              command: 'buildAndPush'
+              tags: |
+                $(Build.BuildId)
+                latest
+                $(version)
+
+  # Deploy on K8s with Helm
+  - stage: 'Serving_helm'
+    displayName: 'Serving_Helm'
+    dependsOn: Build
+    condition: or(succeeded(), ne('${{ parameters.SEMVER }}', 'skip') )
+    jobs:
+      - job: Serving_helm
+        displayName: Serving_helm
+        steps:
+          - task: PublishPipelineArtifact@1
+            displayName: 'Publish Artifact manifests'
+            condition: succeeded()
+            inputs:
+              targetPath: '$(Build.Repository.LocalPath)/helm'
+              artifact: 'helm'
+              publishLocation: 'pipeline'
+
+  - stage: 'Deploy'
+    displayName: 'Deploy_to_${{ parameters.ENV }}'
+    dependsOn: "Serving_helm"
+    condition: or(succeeded(), ne('${{ parameters.SEMVER }}', 'skip') )
+    jobs:
+      - deployment: 'Deploy_to_${{ parameters.ENV }}'
+        displayName: 'Deploy_to_${{ parameters.ENV }}'
+        environment: '${{ parameters.ENV }}'
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - download: none
+                - task: DownloadPipelineArtifact@2
+                  inputs:
+                    buildType: 'current'
+                    artifactName: 'helm'
+                    targetPath: '$(Pipeline.Workspace)/helm'
+                - task: Bash@3
+                  name: helm_dependency_build
+                  displayName: Helm dependency build
+                  inputs:
+                    workingDirectory: '$(Pipeline.Workspace)/helm'
+                    targetType: 'inline'
+                    script: |
+                      helm repo add pagopa-microservice https://pagopa.github.io/aks-microservice-chart-blueprint
+                      helm dep build
+                    failOnStderr: true
+                - task: HelmDeploy@0
+                  displayName: Helm upgrade
+                  inputs:
+                    kubernetesServiceEndpoint: ${{ variables.kubernetesServiceConnection }}
+                    namespace: '$(nameSpace)'
+                    command: upgrade
+                    chartType: filepath
+                    chartPath: $(Pipeline.Workspace)/helm
+                    chartName: $(imageRepository)
+                    releaseName: $(imageRepository)
+                    valueFile: "$(Pipeline.Workspace)/helm/values-${{ parameters.ENV }}.yaml"
+                    install: true
+                    waitForExecution: true
+                    arguments: "--timeout 5m0s"
