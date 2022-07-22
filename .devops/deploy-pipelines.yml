@@ -138,7 +138,7 @@ stages:
   # Deploy on K8s with Helm
   - stage: 'Serving_helm'
     displayName: 'Serving_Helm'
-    dependsOn: prepare_artifact
+    condition: not(failed('prepare_artifact'))
     jobs:
       - job: Serving_helm
         displayName: Serving_helm
@@ -153,7 +153,7 @@ stages:
 
   - stage: 'Deploy'
     displayName: 'Deploy_to_${{ parameters.ENV }}'
-    dependsOn: "Serving_helm"
+    condition: not(failed('Serving_helm'))
     jobs:
       - deployment: 'Deploy_to_${{ parameters.ENV }}'
         displayName: 'Deploy_to_${{ parameters.ENV }}'
