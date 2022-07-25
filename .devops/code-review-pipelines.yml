@@ -76,7 +76,7 @@ stages:
           - template: templates/node-job-setup/template.yaml@pagopaCommons
 
           - script: |
-              yarn test:coverage
+              yarn test
             displayName: 'Unit tests exec'
 
   - stage: Sonarcloud
@@ -106,9 +106,9 @@ stages:
                   sonar.javascript.file.suffixes=.js,.jsx
                   sonar.typescript.file.suffixes=.ts,.tsx
                   sonar.sources=.
-                  sonar.exclusions=src/__tests__/**
-                  sonar.tests=src/__tests__
-                  sonar.test.inclusions=src/__tests__/**/*.test.tsx
+                  sonar.exclusions=**/__tests__/**
+                  sonar.tests=**/__tests__
+                  sonar.test.inclusions=**/__tests__/**/*.test.ts
                   sonar.testExecutionReportPaths=test-report.xml
                   sonar.sourceEncoding=UTF-8
                   sonar.verbose=true
