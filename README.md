@@ -6,6 +6,11 @@ This project is an Azure Function to implement the microservice for **Donations*
 This service is called by [GPS](https://github.com/pagopa/pagopa-spontaneous-payments) 
 
 ---
+## Api Documentation 📖
+
+See the [OpenApi 3 here.](https://editor.swagger.io/?url=https://raw.githubusercontent.com/pagopa/pagopa-gps-donation-service/main/openapi/openapi.json)
+
+---
 
 ## Technology Stack 📚
 - Node JS (👀 `.node-version` file)
