@@ -21,13 +21,18 @@ See the [OpenApi 3 here.](https://editor.swagger.io/?url=https://raw.githubuserc
 
 
 # How to run Locally 🚀
-Before to start locally: 
+To start locally: 
 - Create a `local.settings.json` file (👀 `local.settings.json.example`) 
 - Install dependencies: `yarn install`
 - Then start the function:`yarn start`
 
 
 Use `/api-test/local-curl.sh` to try the HTTP function
+
+## Docker 🐳
+Alternatively you can use **Docker** to run locally:
+
+`docker-compose up`
 
 ---
 # Run Tests 🧪
