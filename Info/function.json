@@ -4,11 +4,12 @@
       "authLevel": "function",
       "type": "httpTrigger",
       "direction": "in",
-      "name": "req",
+      "name": "Info",
       "methods": [
         "get"
-      ]
-    },
+      ],
+      "route": "donation/info"
+    },   
     {
       "type": "http",
       "direction": "out",
