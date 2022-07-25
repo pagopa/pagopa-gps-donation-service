@@ -4,10 +4,11 @@
       "authLevel": "function",
       "type": "httpTrigger",
       "direction": "in",
-      "name": "req",
+      "name": "Donation",
       "methods": [
         "post"
-      ]
+      ],
+      "route": "donation/paymentoptions"
     },
     {
       "type": "http",

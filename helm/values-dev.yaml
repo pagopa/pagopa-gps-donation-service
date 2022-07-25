@@ -10,7 +10,7 @@ microservice-chart:
 
   livenessProbe:
     httpGet:
-      path: /api/Info
+      path: /donation/info
       port: 7071
     initialDelaySeconds: 120
     failureThreshold: 6
@@ -18,7 +18,7 @@ microservice-chart:
 
   readinessProbe:
     httpGet:
-      path: /api/Info
+      path: /donation/info
       port: 7071
     initialDelaySeconds: 120
     failureThreshold: 6
