@@ -9,6 +9,7 @@ const httpTrigger: AzureFunction = async (
   req: HttpRequest
 ): Promise<void> => {
   context.log("HTTP trigger function processed a request.", req.body);
+  context.log(process.env);
 
   const input = Input.decode(req.body);
 
