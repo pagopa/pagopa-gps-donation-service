@@ -8,7 +8,7 @@
       "methods": [
         "post"
       ],
-      "route": "donation/paymentoptions"
+      "route": "donations/paymentoptions"
     },
     {
       "type": "http",

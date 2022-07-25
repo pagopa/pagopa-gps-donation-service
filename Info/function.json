@@ -8,7 +8,7 @@
       "methods": [
         "get"
       ],
-      "route": "donation/info"
+      "route": "donations/info"
     },   
     {
       "type": "http",
