@@ -11,11 +11,6 @@
 trigger: none
 
 
-variables:
-  NODE_VERSION: '14.19.0'
-  YARN_CACHE_FOLDER: $(Pipeline.Workspace)/.yarn
-
-
 # Execute agents (jobs) on latest Ubuntu version.
 # To change OS for a specific, override "pool" attribute inside the job definition
 pool:
@@ -76,7 +71,7 @@ stages:
           - template: templates/node-job-setup/template.yaml@pagopaCommons
 
           - script: |
-              yarn test:coverage
+              yarn test
             displayName: 'Unit tests exec'
 
   - stage: Sonarcloud
@@ -86,23 +81,23 @@ stages:
           steps:
             - template: templates/node-job-setup/template.yaml@pagopaCommons
 
-            - script: git branch
-              displayName: 'Branch identification'
-
+         
             - task: SonarCloudPrepare@1
               displayName: 'Prepare SonarCloud analysis configuration'
               inputs:
                 SonarCloud: '$(SONARCLOUD_SERVICE_CONN)'
                 organization: '$(SONARCLOUD_ORG)'
                 scannerMode: 'CLI'
-                configMode: 'file'
+                configMode: 'manual'
+                cliProjectKey: '$(SONARCLOUD_PROJECT_KEY)'
+                cliProjectName: '$(SONARCLOUD_PROJECT_NAME)'
+                cliSources: '.'
                 extraProperties: |
                   sonar.javascript.file.suffixes=.js,.jsx
                   sonar.typescript.file.suffixes=.ts,.tsx
                   sonar.sources=.
-                  sonar.exclusions=src/__tests__/**
-                  sonar.tests=src/__tests__
-                  sonar.test.inclusions=src/__tests__/**/*.test.tsx
+                  sonar.exclusions=**/__tests__/**
+                  sonar.test.inclusions=**/__tests__/**/*.test.ts
                   sonar.testExecutionReportPaths=test-report.xml
                   sonar.sourceEncoding=UTF-8
                   sonar.verbose=true

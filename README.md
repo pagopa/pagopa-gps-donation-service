@@ -39,7 +39,7 @@ Alternatively you can use **Docker** to run locally:
 To run the unit tests and get the coverage: 
 
 ```
-yarn test:coverage
+yarn test:local
 ```
 
 

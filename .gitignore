@@ -44,3 +44,6 @@ __pycache__/
 /coverage/
 .idea/
 *.tgz
+/test-report.xml
+/eslint-report.json
+/.eslintcache
