@@ -97,16 +97,10 @@ stages:
                 scannerMode: Other
                 projectKey: $(SONARCLOUD_PROJECT_KEY)
                 projectName: $(SONARCLOUD_PROJECT_NAME)
-                #              scannerMode: CLI
-                #              configMode: manual
-                #              cliProjectKey: $(SONARCLOUD_PROJECT_KEY)
-                #              cliProjectName: $(SONARCLOUD_PROJECT_NAME)
-                #              cliSources: $(Build.Repository.LocalPath)
                 extraProperties: |
                   sonar.javascript.file.suffixes=.js,.jsx
                   sonar.typescript.file.suffixes=.ts,.tsx
-                  sonar.sources=.
-                  sonar.exclusions=**/__tests__/**
+                  sonar.sources=**/Donation/**.**/Info/**
                   sonar.tests=**/__tests__
                   sonar.test.inclusions=**/__tests__/**/*.test.ts
                   sonar.testExecutionReportPaths=test-report.xml
