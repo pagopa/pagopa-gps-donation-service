@@ -11,11 +11,6 @@
 trigger: none
 
 
-variables:
-  NODE_VERSION: '14.19.0'
-  YARN_CACHE_FOLDER: $(Pipeline.Workspace)/.yarn
-
-
 # Execute agents (jobs) on latest Ubuntu version.
 # To change OS for a specific, override "pool" attribute inside the job definition
 pool:
