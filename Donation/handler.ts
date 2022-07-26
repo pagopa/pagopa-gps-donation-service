@@ -7,8 +7,8 @@ const ProblemJson = t.type({
 });
 
 const Properties = t.type({
-  amount: t.number,
-  description: t.string
+  amount: t.string,
+  description: t.union([t.string, t.undefined])
 });
 
 export const Input = t.type({

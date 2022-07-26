@@ -26,7 +26,8 @@ const httpTrigger: AzureFunction = async (
   const properties = input.right.properties;
 
   // check amount
-  if (isNaN(properties.amount) || properties.amount < 0) {
+  const amount: number = Number(properties.amount);
+  if (isNaN(amount) || amount < 0) {
     // eslint-disable-next-line functional/immutable-data
     context.res = errorResponseFactory(
       400,
@@ -41,7 +42,7 @@ const httpTrigger: AzureFunction = async (
   const body = {
     paymentOption: [
       {
-        amount: properties.amount,
+        amount,
         description: properties.description,
         dueDate: addDays(new Date(), Number(process.env.ADD_DUE_DATE_DAYS)),
         isPartialPayment: false,
@@ -51,7 +52,7 @@ const httpTrigger: AzureFunction = async (
         ),
         transfer: [
           {
-            amount: properties.amount
+            amount
           }
         ]
       }
