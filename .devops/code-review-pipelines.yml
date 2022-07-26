@@ -102,7 +102,6 @@ stages:
                   sonar.typescript.file.suffixes=.ts,.tsx
                   sonar.sources=.
                   sonar.exclusions=**/__tests__/**
-                  sonar.tests=**/__tests__
                   sonar.test.inclusions=**/__tests__/**/*.test.ts
                   sonar.testExecutionReportPaths=test-report.xml
                   sonar.sourceEncoding=UTF-8
