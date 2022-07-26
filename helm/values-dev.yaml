@@ -12,7 +12,7 @@ microservice-chart:
     httpGet:
       path: /donation/info
       port: 7071
-    initialDelaySeconds: 120
+    initialDelaySeconds: 90
     failureThreshold: 6
     periodSeconds: 10
 
@@ -20,7 +20,7 @@ microservice-chart:
     httpGet:
       path: /donation/info
       port: 7071
-    initialDelaySeconds: 120
+    initialDelaySeconds: 90
     failureThreshold: 6
     periodSeconds: 10
 
@@ -53,11 +53,11 @@ microservice-chart:
 
   resources:
     requests:
-      memory: "350Mi"
-      cpu: "80m"
+      memory: "500Mi"
+      cpu: "350m"
     limits:
-      memory: "450Mi"
-      cpu: "150m"
+      memory: "500Mi"
+      cpu: "350m"
 
   autoscaling:
     minReplica: 1
