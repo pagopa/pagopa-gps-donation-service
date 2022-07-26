@@ -7,7 +7,7 @@ describe("feature donation", () => {
     it('success', async () => {
         const req = {
             properties: {
-                amount: 100,
+                amount: "100",
                 description: "ukraine"
             }
         };
@@ -15,7 +15,7 @@ describe("feature donation", () => {
 
         expect(result.res.status).toEqual(200);
         const body = result.res.body;
-        expect(body.paymentOption[0].amount).toEqual(req.properties.amount);
+        expect(body.paymentOption[0].amount).toEqual(Number(req.properties.amount));
         expect(body.paymentOption[0].description).toEqual(req.properties.description);
         expect(result.res.headers['Content-Type']).toEqual("application/json");
     });
@@ -24,7 +24,7 @@ describe("feature donation", () => {
     it('wrong amount', async () => {
         const req = {
             properties: {
-                amount: -100,
+                amount: "-100",
                 description: "ukraine"
             }
         };
