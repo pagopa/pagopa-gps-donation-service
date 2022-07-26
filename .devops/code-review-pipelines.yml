@@ -86,8 +86,8 @@ stages:
           steps:
             - template: templates/node-job-setup/template.yaml@pagopaCommons
 
-            - script: git branch
-              displayName: 'Branch identification'
+            - script: yarn install
+              displayName: 'Install dependencies'
 
             - task: SonarCloudPrepare@1
               displayName: 'Prepare SonarCloud analysis configuration'
