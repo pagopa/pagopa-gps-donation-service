@@ -60,7 +60,7 @@ resources:
     - repository: pagopaCommons
       type: github
       name: pagopa/azure-pipeline-templates
-      ref: refs/tags/v18
+      ref: refs/tags/v2.1.0
       endpoint: 'io-azure-devops-github-ro'
 
 stages:
@@ -79,7 +79,7 @@ stages:
               persistCredentials: true
               gitReference: $(SOURCE_BRANCH)
 
-          - template: azure-templates/node-versioning.yml
+          - template: templates/maven-github-release/template.yaml@pagopaCommons
             parameters:
               semver: '${{ parameters.SEMVER }}'
               release_branch: $(SOURCE_BRANCH)
@@ -87,10 +87,6 @@ stages:
               gitUsername: $(GIT_USERNAME)
               gitHubConnection: $(GITHUB_CONNECTION)
 
-          - script: |
-              echo $(tag)
-              echo $(title)
-              echo $(sha)
 
 
   # Prepare Artifact with application bundle
