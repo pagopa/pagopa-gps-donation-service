@@ -46,7 +46,6 @@ variables:
   title: ""
   sha: ""
   tag: ""
-  version: ""
 
 # Only manual triggers
 trigger: none
@@ -60,7 +59,7 @@ resources:
     - repository: pagopaCommons
       type: github
       name: pagopa/azure-pipeline-templates
-      ref: refs/tags/v18
+      ref: refs/tags/v2.1.0
       endpoint: 'io-azure-devops-github-ro'
 
 stages:
@@ -79,7 +78,7 @@ stages:
               persistCredentials: true
               gitReference: $(SOURCE_BRANCH)
 
-          - template: azure-templates/node-versioning.yml
+          - template: templates/node-github-release/template.yaml@pagopaCommons
             parameters:
               semver: '${{ parameters.SEMVER }}'
               release_branch: $(SOURCE_BRANCH)
@@ -87,10 +86,6 @@ stages:
               gitUsername: $(GIT_USERNAME)
               gitHubConnection: $(GITHUB_CONNECTION)
 
-          - script: |
-              echo $(tag)
-              echo $(title)
-              echo $(sha)
 
 
   # Prepare Artifact with application bundle
@@ -117,10 +112,15 @@ stages:
           - script: yarn build
             displayName: 'Build'
 
-          - script: |
-              VERSION=$(node -p "require('./package.json').version")
-              echo "##vso[task.setvariable variable=version]VERSION"
-            displayName: 'Get Version'
+          - task: Bash@3
+            displayName: Get Node version
+            name: getVersion
+            inputs:
+              targetType: 'inline'
+              script: |
+                version=$(node -p "require('./package.json').version")
+                echo "##vso[task.setvariable variable=value;isOutput=true]$version"
+
 
           - task: Docker@2
             displayName: Build and push an image to container registry
@@ -131,7 +131,7 @@ stages:
               tags: |
                 $(Build.BuildId)
                 latest
-                $(version)
+                $(getVersion.value)
 
   # Deploy on K8s with Helm
   - stage: 'Serving_helm'
