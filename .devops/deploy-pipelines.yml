@@ -27,13 +27,15 @@ variables:
   ${{ if eq(parameters['ENV'], 'dev') }}:
     dockerRegistryServiceConnection: $(DEV_CONTAINER_REGISTRY)
     kubernetesServiceConnection: '$(DEV_KUBERNETES_SERVICE_CONN)'
+    poolImage: 'ubuntu-latest'
   ${{ if eq(parameters['ENV'], 'uat') }}:
     dockerRegistryServiceConnection: $(UAT_CONTAINER_REGISTRY)
     kubernetesServiceConnection: '$(UAT_KUBERNETES_SERVICE_CONN)'
+    poolImage: 'pagopa-uat-linux'
   ${{ if eq(parameters['ENV'], 'prod') }}:
     dockerRegistryServiceConnection: $(PROD_CONTAINER_REGISTRY)
     kubernetesServiceConnection: '$(PROD_KUBERNETES_SERVICE_CONN)'
-
+    poolImage: 'pagopa-prod-linux'
   ${{ if eq(variables['Build.SourceBranchName'], 'merge') }}:
     SOURCE_BRANCH: "main" # force to main branch
   ${{ if ne(variables['Build.SourceBranchName'], 'merge') }}:
@@ -137,6 +139,8 @@ stages:
   - stage: 'Serving_helm'
     displayName: 'Serving_Helm'
     condition: not(failed('prepare_artifact'))
+    pool:
+      name: pagopa-uat-linux
     jobs:
       - job: Serving_helm
         displayName: Serving_helm
@@ -152,6 +156,8 @@ stages:
   - stage: 'Deploy'
     displayName: 'Deploy_to_${{ parameters.ENV }}'
     condition: not(failed('Serving_helm'))
+    pool:
+      name: $(poolImage)    
     jobs:
       - deployment: 'Deploy_to_${{ parameters.ENV }}'
         displayName: 'Deploy_to_${{ parameters.ENV }}'
