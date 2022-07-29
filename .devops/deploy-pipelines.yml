@@ -139,8 +139,6 @@ stages:
   - stage: 'Serving_helm'
     displayName: 'Serving_Helm'
     condition: not(failed('prepare_artifact'))
-    pool:
-      name: pagopa-uat-linux
     jobs:
       - job: Serving_helm
         displayName: Serving_helm
