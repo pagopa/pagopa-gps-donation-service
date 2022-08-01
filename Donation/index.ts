@@ -8,7 +8,11 @@ const httpTrigger: AzureFunction = async (
   context: Context,
   req: HttpRequest
 ): Promise<void> => {
-  context.log("HTTP trigger function processed a request.", req.body);
+  const requestId = req.headers["x-request-id"] ?? uuidv4();
+  context.log(
+    "[requestId=" + requestId + "] HTTP trigger function processed a request.",
+    req.body
+  );
 
   const input = Input.decode(req.body);
 
@@ -19,7 +23,7 @@ const httpTrigger: AzureFunction = async (
       "Bad Request",
       "Request malformed",
       // eslint-disable-next-line sonarjs/no-duplicate-string
-      req.headers["x-request-id"] ?? uuidv4()
+      requestId
     );
     return;
   }
@@ -33,7 +37,7 @@ const httpTrigger: AzureFunction = async (
       400,
       "Bad Request",
       "Amount must be a positive number",
-      req.headers["x-request-id"] ?? uuidv4()
+      requestId
     );
     return;
   }
@@ -64,7 +68,7 @@ const httpTrigger: AzureFunction = async (
     body,
     headers: {
       "Content-Type": "application/json",
-      "X-Request-Id": req.headers["x-request-id"] ?? uuidv4()
+      "X-Request-Id": requestId
     },
     status: 200
   };
