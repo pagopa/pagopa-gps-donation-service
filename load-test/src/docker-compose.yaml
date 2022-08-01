@@ -1,0 +1,10 @@
+version: "3.2"
+
+services:
+  load-test:
+    container_name: 'load-test'
+    ports:
+      - "5665:5665"
+    build:
+      context: ./
+      dockerfile: Dockerfile

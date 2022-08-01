@@ -4,6 +4,10 @@
 import { check, sleep} from 'k6';
 import { SharedArray } from 'k6/data';
 
+import { htmlReport } from "https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js";
+import { textSummary } from "https://jslib.k6.io/k6-summary/0.0.1/index.js";
+
+
 import {
 	donationPaymentOptions
 } from "./helpers/donations_client.js";
@@ -64,4 +68,12 @@ export function teardown(data) {
 	// postcondition is moved to default fn because in this stage
 	// __VU is always 0 and cannot be used to create env properly
 
+}
+
+
+export function handleSummary(data) {
+	return {
+		"result.html": htmlReport(data),
+		stdout: textSummary(data, { indent: " ", enableColors: true }),
+	};
 }
