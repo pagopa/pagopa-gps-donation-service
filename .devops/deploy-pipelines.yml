@@ -106,6 +106,7 @@ stages:
               echo "Checkout on $(SOURCE_BRANCH)"
               cd pagopa-gps-donation-service
               git checkout $(SOURCE_BRANCH)
+              cd ..
             displayName: Checkout on source branch
 
           # Build application
