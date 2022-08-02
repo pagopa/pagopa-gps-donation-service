@@ -2,12 +2,10 @@ microservice-chart:
   namespace: "gps"
   nameOverride: ""
   fullnameOverride: ""
-
   image:
     repository: pagopadcommonacr.azurecr.io/pagopagpsdonationservice
-    tag: "latest" #improve
+    tag: "1.0.3-15" #improve
     pullPolicy: Always
-
   livenessProbe:
     httpGet:
       path: /donations/info
@@ -15,7 +13,6 @@ microservice-chart:
     initialDelaySeconds: 90
     failureThreshold: 6
     periodSeconds: 10
-
   readinessProbe:
     httpGet:
       path: /donations/info
@@ -23,34 +20,26 @@ microservice-chart:
     initialDelaySeconds: 90
     failureThreshold: 6
     periodSeconds: 10
-
   deployment:
     create: true
-
   service:
     create: true
     type: ClusterIP
     port: 7071
-
   ingress:
     create: true
     host: "weudev.gps.internal.dev.platform.pagopa.it"
     path: /pagopa-gps-donation-service/(.*)
-
   serviceAccount:
     create: false
     annotations: {}
     name: ""
-
   podAnnotations: {}
-
   podSecurityContext:
     seccompProfile:
       type: RuntimeDefault
-
   securityContext:
     allowPrivilegeEscalation: false
-
   resources:
     requests:
       memory: "500Mi"
@@ -58,7 +47,6 @@ microservice-chart:
     limits:
       memory: "500Mi"
       cpu: "350m"
-
   autoscaling:
     minReplica: 1
     maxReplica: 2
@@ -77,19 +65,13 @@ microservice-chart:
           # metricAggregationInterval: "-1:1:0"
           metricAggregationType: Count
           targetValue: "30"
-
   envConfig:
     FUNCTIONS_WORKER_RUNTIME: "node"
     ADD_DUE_DATE_DAYS: "15"
     ADD_RETENTION_DATE_DAYS: "15"
-
   keyvault:
     name: "pagopa-d-gps-kv"
     tenantId: "7788edaf-0346-4068-9d79-c868aed15b3d"
-
   nodeSelector: {}
-
   tolerations: []
-
   affinity: {}
-
