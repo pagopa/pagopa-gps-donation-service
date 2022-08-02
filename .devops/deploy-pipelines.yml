@@ -80,10 +80,6 @@ stages:
             persistCredentials: true
 
           - bash: |
-              git fetch && git checkout $(SOURCE_BRANCH)
-            displayName: 'Checkout reference'
-
-          - bash: |
               pwd
               ls
               cd .
