@@ -104,8 +104,7 @@ stages:
 
           - script: |
               echo "Checkout on $(SOURCE_BRANCH)"
-              pwd
-              ls
+              cd pagopa-gps-donation-service
               git checkout $(SOURCE_BRANCH)
             displayName: Checkout on source branch
 
