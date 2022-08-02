@@ -98,6 +98,11 @@ stages:
     jobs:
       - job: 'make_build'
         steps:
+          - script: |
+              echo "Checkout on $(SOURCE_BRANCH)"
+              git checkout $(SOURCE_BRANCH)
+            displayName: Checkout on source branch
+
           # Build application
           - template: templates/node-job-setup/template.yaml@pagopaCommons
             parameters:
@@ -143,6 +148,11 @@ stages:
       - job: Serving_helm
         displayName: Serving_helm
         steps:
+          - script: |
+              echo "Checkout on $(SOURCE_BRANCH)"
+              git checkout $(SOURCE_BRANCH)
+            displayName: Checkout on source branch
+
           - task: PublishPipelineArtifact@1
             displayName: 'Publish Artifact manifests'
             condition: succeeded()
@@ -164,6 +174,11 @@ stages:
           runOnce:
             deploy:
               steps:
+                - script: |
+                    echo "Checkout on $(SOURCE_BRANCH)"
+                    git checkout $(SOURCE_BRANCH)
+                  displayName: Checkout on source branch
+
                 - download: none
                 - task: DownloadPipelineArtifact@2
                   inputs:
