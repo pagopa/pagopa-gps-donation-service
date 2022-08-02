@@ -3,7 +3,7 @@
   "description": "Donation Service",
   "author": "pagoPa tech",
   "repository": "https://github.com/pagopa/pagopa-gps-donation-service",
-  "version": "1.0.3-6",
+  "version": "1.0.3-7",
   "license": "MIT",
   "scripts": {
     "build": "tsc",
