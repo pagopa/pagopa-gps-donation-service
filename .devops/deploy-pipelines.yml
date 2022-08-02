@@ -79,6 +79,7 @@ stages:
             parameters:
               persistCredentials: true
               gitReference: $(SOURCE_BRANCH)
+              projectDir: 'pagopa-gps-donation-service'
 
           - template: templates/node-github-release/template.yaml@pagopaCommons
             parameters:
@@ -104,9 +105,7 @@ stages:
 
           - script: |
               echo "Checkout on $(SOURCE_BRANCH)"
-              cd pagopa-gps-donation-service
               git checkout $(SOURCE_BRANCH)
-              cd ..
             displayName: Checkout on source branch
 
           # Build application
@@ -118,6 +117,7 @@ stages:
               #  ex: Build.SourceBranch=refs/heads/master --> master
               #  ex: Build.SourceBranch=refs/tags/v1.2.3-RELEASE --> v1.2.3-RELEASE
               gitReference: ${{ replace(replace(variables['Build.SourceBranch'], 'refs/tags/', ''), 'refs/heads/', '') }}
+              projectDir: 'pagopa-gps-donation-service'
 
           - script: yarn test
             displayName: 'Test'
