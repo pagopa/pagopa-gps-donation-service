@@ -104,7 +104,7 @@ stages:
 
           - script: |
               echo "Checkout on $(SOURCE_BRANCH)"
-              git checkout $(SOURCE_BRANCH)
+              cd .. &&  git checkout $(SOURCE_BRANCH)
             displayName: Checkout on source branch
 
           # Build application
