@@ -166,12 +166,6 @@ stages:
           runOnce:
             deploy:
               steps:
-                - script: |
-                    cd ./pagopa-gps-donation-service
-                    echo "Checkout on $(SOURCE_BRANCH)"
-                    git checkout $(SOURCE_BRANCH)
-                  displayName: Checkout on source branch
-
                 - download: none
                 - task: DownloadPipelineArtifact@2
                   inputs:
