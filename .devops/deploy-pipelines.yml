@@ -75,6 +75,23 @@ stages:
     jobs:
       - job: releaseService
         steps:
+          - checkout: self
+            displayName: 'Checkout'
+            persistCredentials: true
+
+          - bash: |
+              git fetch && git checkout $(SOURCE_BRANCH)
+            displayName: 'Checkout reference'
+
+          - bash: |
+              pwd
+              ls
+              cd .
+              pwd
+              ls
+              echo "current folder: $(pwd)"
+            displayName: 'Move to project folder'
+
           - template: templates/node-job-setup/template.yaml@pagopaCommons
             parameters:
               persistCredentials: true
