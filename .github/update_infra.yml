@@ -22,7 +22,7 @@ jobs:
       # prepare openapi template for infra repo
       - run: |
           mkdir -p "${GITHUB_WORKSPACE}/infra"
-          jq  '."servers"[0]."url" |= "${host}/gps/spontaneous-payments-service/v1"' "${GITHUB_WORKSPACE}/openapi/openapi.json" > "${GITHUB_WORKSPACE}/infra/_openapi.json.tpl"
+          jq  '."servers"[0]."url" |= "${host}/gps/donation-service/v1"' "${GITHUB_WORKSPACE}/openapi/openapi.json" > "${GITHUB_WORKSPACE}/infra/_openapi.json.tpl"
 
       # open a PR on infra repo
       - name: Create pull request
@@ -32,9 +32,9 @@ jobs:
         with:
           source_folder: 'infra'
           destination_repo: 'pagopa/pagopa-infra'
-          destination_folder: 'src/gps/api/spontaneous-payments-service/v1'
+          destination_folder: 'src/domains/gps-app/api/gps-donation-service/v1'
           destination_base_branch: 'main'
-          destination_head_branch: 'SpontaneousPayments-swagger-update'
+          destination_head_branch: 'GpsDonationService-swagger-update'
           user_email: 'github-bot@pagopa.it'
           user_name: 'pagopa-github-bot'
           allow_force_push: 'true'
