@@ -50,4 +50,3 @@ Made with ❤️ by PagoPa S.p.A.
 
 ### Mainteiners
 See `CODEOWNERS` file
-
