@@ -132,67 +132,42 @@ stages:
                 $(getVersion.value)
 
   # Deploy on K8s with Helm
-  - stage: 'Serving_helm'
-    displayName: 'Serving_Helm'
-    condition: not(failed('prepare_artifact'))
+  - stage: Deploy
+    #    condition: not(failed('Smoke_Test'))
+    dependsOn:
+      - Release
+      - Build
+    #      - Smoke_Test
+    variables:
+      deploy_version: $[ stageDependencies.Release.make_release.outputs['current_version.value'] ]
     jobs:
-      - job: Serving_helm
-        displayName: Serving_helm
-        steps:
-          - script: |
-              cd ./pagopa-gps-donation-service
-              echo "Checkout on $(SOURCE_BRANCH)"
-              git checkout $(SOURCE_BRANCH)
-            displayName: Checkout on source branch
-
-          - task: PublishPipelineArtifact@1
-            displayName: 'Publish Artifact manifests'
-            condition: succeeded()
-            inputs:
-              targetPath: '$(Build.Repository.LocalPath)/helm'
-              artifact: 'helm'
-              publishLocation: 'pipeline'
-
-  - stage: 'Deploy'
-    displayName: 'Deploy_to_${{ parameters.ENV }}'
-    condition: not(failed('Serving_helm'))
-    pool:
-      name: $(poolImage)    
-    jobs:
-      - deployment: 'Deploy_to_${{ parameters.ENV }}'
-        displayName: 'Deploy_to_${{ parameters.ENV }}'
-        environment: '${{ parameters.ENV }}'
+      - deployment: "deploy"
+        pool:
+          name: $(poolImage)
+        environment: ${{ parameters['ENV'] }}
         strategy:
           runOnce:
             deploy:
               steps:
-                - download: none
-                - task: DownloadPipelineArtifact@2
-                  inputs:
-                    buildType: 'current'
-                    artifactName: 'helm'
-                    targetPath: '$(Pipeline.Workspace)/helm'
-                - task: Bash@3
-                  name: helm_dependency_build
-                  displayName: Helm dependency build
-                  inputs:
-                    workingDirectory: '$(Pipeline.Workspace)/helm'
-                    targetType: 'inline'
-                    script: |
-                      helm repo add pagopa-microservice https://pagopa.github.io/aks-microservice-chart-blueprint
-                      helm dep build
-                    failOnStderr: true
-                - task: HelmDeploy@0
-                  displayName: Helm upgrade
-                  inputs:
-                    kubernetesServiceEndpoint: ${{ variables.kubernetesServiceConnection }}
-                    namespace: '$(nameSpace)'
-                    command: upgrade
-                    chartType: filepath
-                    chartPath: $(Pipeline.Workspace)/helm
-                    chartName: $(imageRepository)
-                    releaseName: $(imageRepository)
-                    valueFile: "$(Pipeline.Workspace)/helm/values-${{ parameters.ENV }}.yaml"
-                    install: true
-                    waitForExecution: true
-                    arguments: "--timeout 5m0s"
+                - checkout: self
+                  persistCredentials: true
+
+                - script: |
+                    git checkout $(sourceBranch)
+                  displayName: Checkout and update branch
+
+                - template: templates/helm-microservice-chart-setup/template.yaml@pagopaCommons
+                  parameters:
+                    DEPLOY_VERSION: $(deploy_version)
+
+                - template: templates/helm-microservice-chart-deploy/template.yaml@pagopaCommons
+                  parameters:
+                    DO_DEPLOY: true
+                    ENV: ${{ parameters['ENV'] }}
+                    KUBERNETES_SERVICE_CONN: ${{ variables.kubernetesServiceConnection }}
+                    NAMESPACE: $(nameSpace)
+                    APP_NAME: $(imageRepository)
+                    VALUE_FILE: "helm/values-${{ parameters['ENV'] }}.yaml"
+                    DEPLOY_VERSION: $(deploy_version)
+                    APPINSIGHTS_SERVICE_CONN: ${{ variables.appInsightsServiceConn }}
+                    APPINSIGHTS_RESOURCE_ID: ${{ variables.appInsightsResourceId }}
