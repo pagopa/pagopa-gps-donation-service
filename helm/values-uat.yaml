@@ -9,14 +9,14 @@ microservice-chart:
   livenessProbe:
     httpGet:
       path: /donations/info
-      port: 7071
+      port: 80
     initialDelaySeconds: 90
     failureThreshold: 6
     periodSeconds: 10
   readinessProbe:
     httpGet:
       path: /donations/info
-      port: 7071
+      port: 80
     initialDelaySeconds: 90
     failureThreshold: 6
     periodSeconds: 10
@@ -25,7 +25,7 @@ microservice-chart:
   service:
     create: true
     type: ClusterIP
-    port: 7071
+    port: 80
   ingress:
     create: true
     host: "weuuat.gps.internal.uat.platform.pagopa.it"
