@@ -3,7 +3,7 @@ microservice-chart:
   nameOverride: ""
   fullnameOverride: ""
   image:
-    repository: pagopadcommonacr.azurecr.io/pagopagpsdonationservice
+    repository: ghcr.io/pagopa/pagopa-gps-donation-service
     tag: "1.0.3-17" #improve
     pullPolicy: Always
   livenessProbe:

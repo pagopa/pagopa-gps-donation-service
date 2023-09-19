@@ -104,6 +104,14 @@ jobs:
           beta: ${{ inputs.beta }}
           skip_ci: false
 
+      - name: Make Release
+        id: release
+        uses: pagopa/github-actions-template/node-release@helm-release
+        with:
+          semver: ${{ needs.setup.outputs.semver }}
+          github_token: ${{ secrets.BOT_TOKEN_GITHUB }}
+          skip_ci: false
+
   build-and-push:
     needs: [ setup, release ]
     name: Build and Push Docker Image
