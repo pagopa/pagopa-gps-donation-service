@@ -108,7 +108,7 @@ jobs:
     needs: [ setup, release ]
     name: Build and Push Docker Image
     runs-on: ubuntu-latest
-    if: ${{ inputs.semver != 'skip' }}
+    if: ${{ inputs.skip_release == 'true' }}
     steps:
       - name: Build and Push
         id: semver
