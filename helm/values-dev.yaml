@@ -25,7 +25,8 @@ microservice-chart:
   service:
     create: true
     type: ClusterIP
-    port: 7071
+    ports:
+      - 7071
   ingress:
     create: true
     host: "weudev.gps.internal.dev.platform.pagopa.it"
