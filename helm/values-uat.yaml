@@ -77,3 +77,4 @@ microservice-chart:
     deployment:
       image:
         tag: 1.1.0-4-PAGOPA-1212-migrazione-gha-pagopa-gps-donation-service
+        repository: ghcr.io/pagopa/pagopa-gps-donation-service
