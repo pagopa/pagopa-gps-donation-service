@@ -97,7 +97,7 @@ jobs:
     steps:
       - name: Make Release
         id: release
-        uses: pagopa/github-actions-template/node-release@helm-release
+        uses: pagopa/github-actions-template/node-release@main
         with:
           semver: ${{ needs.setup.outputs.semver }}
           beta: ${{ inputs.beta }}
