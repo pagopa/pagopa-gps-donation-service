@@ -10,7 +10,7 @@ const httpTrigger: AzureFunction = async (
 ): Promise<void> => {
   const requestId = req.headers["x-request-id"] ?? uuidv4();
   context.log(
-    "[requestId=" + requestId + "] HTTP trigger function processed a request.",
+    "[requestId-1=" + requestId + "] HTTP trigger function processed a request.",
     req.body
   );
 
@@ -28,6 +28,11 @@ const httpTrigger: AzureFunction = async (
     return;
   }
   const properties = input.right.properties;
+
+  context.log(
+    "[requestId-2=" + requestId + "] HTTP trigger function processed a request.",
+    req.body
+  );
 
   // check amount
   const amount: number = Number(properties.amount);
@@ -62,6 +67,11 @@ const httpTrigger: AzureFunction = async (
       }
     ]
   };
+
+  context.log(
+    "[requestId-3=" + requestId + "] HTTP trigger function processed a request.",
+    req.body
+  );
 
   // eslint-disable-next-line functional/immutable-data
   context.res = {
