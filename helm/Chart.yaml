@@ -2,9 +2,9 @@ apiVersion: v2
 name: pagopa-gps-donation-service
 description: Microservice to handle Donations for GPS
 type: application
-version: 1.0.0
-appVersion: 1.0.0
+version: 1.11.0
+appVersion: 1.1.0-16-PAGOPA-1212-migrazione-gha-pagopa-gps-donation-service
 dependencies:
-- name: microservice-chart
-  version: 1.21.0
-  repository: "https://pagopa.github.io/aks-microservice-chart-blueprint"
+  - name: microservice-chart
+    version: 2.4.0
+    repository: "https://pagopa.github.io/aks-microservice-chart-blueprint"

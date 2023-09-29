@@ -97,19 +97,18 @@ jobs:
     steps:
       - name: Make Release
         id: release
-        uses: pagopa/github-actions-template/maven-release@v1.5.4
+        uses: pagopa/github-actions-template/node-release@main
         with:
           semver: ${{ needs.setup.outputs.semver }}
-          github_token: ${{ secrets.BOT_TOKEN_GITHUB }}
           beta: ${{ inputs.beta }}
+          github_token: ${{ secrets.BOT_TOKEN_GITHUB }}
           skip_ci: false
 
-  build-and-push:
+  image:
     needs: [ setup, release ]
     name: Build and Push Docker Image
     runs-on: ubuntu-latest
-    if: ${{ inputs.semver != 'skip' }}
-    environment: ${{ inputs.environment }}
+    if: ${{ needs.setup.outputs.semver != 'skip' }}
     steps:
       - name: Build and Push
         id: semver
@@ -119,86 +118,49 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ needs.release.outputs.version }}
 
-  deploy_azure_fn:
-    name: Deploy Azure function
-    environment: ${{ inputs.environment }}
-    needs: [ setup, release, build-and-push ]
-    runs-on: ubuntu-latest
+  deploy_aks_dev:
+    name: Deploy on AKS DEV
+    needs: [ setup, release, image ]
     if: ${{ always() && !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled') }}
+    uses: ./.github/workflows/deploy_with_github_runner.yml
+    with:
+      environment: ${{ needs.setup.outputs.environment }}
+    secrets: inherit
+
+  deploy_aks_uat:
+    name: Deploy on AKS UAT
+    needs: [ setup, release, image ]
+    if: ${{ always() && !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled')  && needs.setup.outputs.environment != 'dev' }}
+    uses: ./.github/workflows/deploy_with_github_runner.yml
+    with:
+      environment: ${{ needs.setup.outputs.environment }}
+    secrets: inherit
+
+  deploy_aks_prod:
+    name: Deploy on AKS PROD
+    needs: [ setup, release, image ]
+    if: ${{ always() && !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled')  && needs.setup.outputs.environment == 'prod' }}
+    uses: ./.github/workflows/deploy_with_github_runner.yml
+    with:
+      environment: ${{ needs.setup.outputs.environment }}
+    secrets: inherit
+
+
+  notify:
+    needs: [ deploy_aks_prod ]
+    runs-on: ubuntu-latest
+    name: Notify
+    if: always()
     steps:
-      - name: 'Checkout GitHub Action'
-        uses: actions/checkout@v3
-
-      - name: 'Login via Azure CLI'
-        uses: azure/login@v1
+      - name: Report Status
+        if: ${{ needs.setup.outputs.environment == 'prod' }}
+        uses: ravsamhq/notify-slack-action@v2
         with:
-          client-id: ${{ secrets.CLIENT_ID }}
-          tenant-id: ${{ secrets.TENANT_ID }}
-          subscription-id: ${{ secrets.SUBSCRIPTION_ID }}
-
-      - name: 'Azure CLI script: start staging slot'
-        uses: azure/CLI@v1
-        if: ${{ contains(github.event.inputs.environment, 'prod') }}
+          status: ${{ needs.deploy_aks_prod.result }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          notification_title: 'New Release on Production ${{ needs.release.outputs.version }} has {status_message}'
+          message_format: '{emoji} <{run_url}|{workflow}> {status_message} in <{repo_url}|{repo}>'
+          footer: 'Linked to <{workflow_url}| workflow file>'
+          icon_success: ':white_check_mark:'
         env:
-          ENV_SHORT: ${{ (contains(github.event.inputs.environment,'prod') && 'p') }}
-        with:
-          inlineScript: |
-            az functionapp start --name pagopa-${{ env.ENV_SHORT }}-weu-fn-gpd-batch --resource-group pagopa-${{ env.ENV_SHORT }}-weu-gps-gpd-rg --slot staging
-
-      - name: 'Run Azure Functions Container Action DEV|UAT: deploy on production slot'
-        uses: Azure/functions-container-action@v1.2.1
-        if: ${{ contains(github.event.inputs.environment, 'dev') || contains(github.event.inputs.environment, 'uat') }}
-        env:
-          ENV_SHORT: ${{ (contains(github.event.inputs.environment,'dev') && 'd') || (contains(github.event.inputs.environment, 'uat') && 'u') }}
-          TAG: ${{needs.release.outputs.version}}
-        with:
-          app-name: "pagopa-${{ env.ENV_SHORT }}-weu-fn-gpd-batch"
-          image: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/${{ env.IMAGE }}:${{ env.TAG }}
-          slot-name: production
-
-      - name: 'Run Azure Functions Container Action PROD: deploy on staging slot'
-        uses: Azure/functions-container-action@v1.2.1
-        if: ${{ contains(github.event.inputs.environment, 'prod') }}
-        env:
-          ENV_SHORT: ${{ (contains(github.event.inputs.environment,'prod') && 'p') }}
-          TAG: ${{needs.release.outputs.version}}
-        with:
-          app-name: "pagopa-${{ env.ENV_SHORT }}-weu-fn-gpd-batch"
-          image: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/${{ env.IMAGE }}:${{ env.TAG }}
-          slot-name: staging
-
-      - name: 'PROD Deploy Approval'
-        uses: trstringer/manual-approval@v1
-        if: ${{ contains(github.event.inputs.environment, 'prod') }}
-        with:
-          secret: ${{ secrets.BOT_TOKEN_GITHUB }}
-          approvers: pagopa-team-core
-          minimum-approvals: 1
-          issue-title: "Deploying ${{ env.TAG }} to prod from staging"
-          issue-body: "Please approve or deny the deployment of version ${{ env.TAG }}."
-          exclude-workflow-initiator-as-approver: false
-          timeout-minutes: 360
-
-      - name: 'Run Azure Functions Container Action PROD: deploy on production slot'
-        uses: Azure/functions-container-action@v1.2.1
-        if: ${{ contains(github.event.inputs.environment, 'prod') }}
-        env:
-          ENV_SHORT: ${{ (contains(github.event.inputs.environment,'prod') && 'p') }}
-          TAG: ${{needs.release.outputs.version}}
-        with:
-          app-name: "pagopa-${{ env.ENV_SHORT }}-weu-fn-gpd-batch"
-          image: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/${{ env.IMAGE }}:${{ env.TAG }}
-          slot-name: production
-
-      - name: 'Azure CLI script: stop staging slot'
-        uses: azure/CLI@v1
-        if: ${{ contains(github.event.inputs.environment, 'prod') }}
-        env:
-          ENV_SHORT: ${{ (contains(github.event.inputs.environment,'prod') && 'p') }}
-        with:
-          inlineScript: |
-            az functionapp stop --name pagopa-${{ env.ENV_SHORT }}-weu-fn-gpd-batch --resource-group pagopa-${{ env.ENV_SHORT }}-weu-gps-gpd-rg --slot staging
-
-      - name: Azure logout
-        run: |
-          az logout
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
