@@ -4,7 +4,7 @@ microservice-chart:
   fullnameOverride: ""
   image:
     repository: ghcr.io/pagopa/pagopa-gps-donation-service
-    tag: "1.1.2" #improve
+    tag: "1.1.2"
     pullPolicy: Always
   livenessProbe:
     httpGet:
@@ -23,6 +23,7 @@ microservice-chart:
   deployment:
     create: true
   service:
+    create: true
     type: ClusterIP
     ports:
       - 7071
