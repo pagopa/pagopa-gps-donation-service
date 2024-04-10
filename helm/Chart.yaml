@@ -2,8 +2,8 @@ apiVersion: v2
 name: pagopa-gps-donation-service
 description: Microservice to handle Donations for GPS
 type: application
-version: 1.15.0
-appVersion: 1.1.2-2-PAGOPA-1668-update-donation-helm
+version: 1.16.0
+appVersion: 1.1.2-3-PAGOPA-1668-update-donation-helm
 dependencies:
   - name: microservice-chart
     version: 2.4.0
