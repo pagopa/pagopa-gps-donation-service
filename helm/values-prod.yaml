@@ -4,7 +4,7 @@ microservice-chart:
   fullnameOverride: ""
   image:
     repository: ghcr.io/pagopa/pagopa-gps-donation-service
-    tag: "1.1.2-4-PAGOPA-1668-update-donation-helm"
+    tag: "1.1.3"
     pullPolicy: Always
   livenessProbe:
     httpGet:
