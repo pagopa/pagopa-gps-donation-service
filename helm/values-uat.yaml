@@ -23,6 +23,7 @@ microservice-chart:
   deployment:
     create: true
   service:
+    create: true
     type: ClusterIP
     ports:
       - 7071
