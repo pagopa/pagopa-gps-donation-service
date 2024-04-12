@@ -4,7 +4,7 @@ microservice-chart:
   fullnameOverride: ""
   image:
     repository: ghcr.io/pagopa/pagopa-gps-donation-service
-    tag: "1.1.4"
+    tag: "1.1.2-5-PAGOPA-1668" #improve
     pullPolicy: Always
   livenessProbe:
     httpGet:
@@ -44,15 +44,15 @@ microservice-chart:
     allowPrivilegeEscalation: false
   resources:
     requests:
-      memory: "512Mi"
-      cpu: "0.5"
+      memory: "256Mi"
+      cpu: "0.25"
     limits:
-      memory: "768Mi"
+      memory: "512Mi"
       cpu: "0.5"
   autoscaling:
     enable: true
     minReplica: 1
-    maxReplica: 10
+    maxReplica: 3
     pollingInterval: 30 # seconds
     cooldownPeriod: 60 # seconds
     triggers:
