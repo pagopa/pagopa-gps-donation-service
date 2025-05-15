@@ -6,7 +6,7 @@
   "version": "1.1.7-PIDM-491-workload-identity",
   "license": "MIT",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && cp -r src/templates dist/src",
     "watch": "tsc --w",
     "prestart": "npm run build && func extensions install",
     "start:host": "func start --javascript",
