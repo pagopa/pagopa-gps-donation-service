@@ -1,11 +1,13 @@
 FROM node:14.19.0
 
-WORKDIR /src/node-function-app
+WORKDIR /tmp
 
 COPY ./ ./
 
 RUN npm i -g azure-functions-core-tools@3 --unsafe-perm true
 RUN yarn install
+
+COPY ./ /src/node-function-app
 
 ENV AzureWebJobsScriptRoot=./ \
     AzureFunctionsJobHost__Logging__Console__IsEnabled=true
