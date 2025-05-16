@@ -1,12 +1,14 @@
 FROM node:14.19.0-slim AS builder
 WORKDIR /app
 COPY . .
+RUN yarn global add npm-run-all --non-interactive
 RUN yarn install --frozen-lockfile
 RUN yarn build
 
 FROM node:14.19.0-slim AS production
 WORKDIR /src/node-function-app
 
+RUN yarn global add npm-run-all --non-interactive
 RUN npm i -g azure-functions-core-tools@3 --unsafe-perm true
 
 COPY --from=builder /app/dist ./dist
@@ -19,6 +21,7 @@ COPY --from=builder /app/Info/function.json ./Info/
 COPY package.json yarn.lock ./
 RUN yarn install --production --frozen-lockfile
 
+RUN yarn global add npm-run-all --non-interactive
 RUN /usr/local/bin/func extensions install
 
 ENV AzureWebJobsScriptRoot=./ \
