@@ -48,7 +48,7 @@ permissions:
 jobs:
   setup:
     name: Setup
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     outputs:
       semver: ${{ steps.get_semver.outputs.semver }}
       environment: ${{ steps.output.outputs.environment }}
@@ -77,7 +77,7 @@ jobs:
 
   release:
     name: Create a New Release
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: [setup]
     outputs:
       version: ${{ steps.release.outputs.version }}
@@ -94,7 +94,7 @@ jobs:
   image:
     needs: [ setup, release ]
     name: Build and Push Docker Image
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     if: ${{ inputs.semver != 'skip' }}
     steps:
       - name: Build and Push
@@ -115,7 +115,7 @@ jobs:
 
   notify:
     needs: [ deploy_aks ]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     name: Notify
     if: always()
     steps:
