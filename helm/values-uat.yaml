@@ -65,6 +65,7 @@ microservice-chart:
   envConfig:
     WEBSITE_SITE_NAME: "pagopagpsdonationservice" # required to show cloud role name in application insights 
     FUNCTIONS_WORKER_RUNTIME: "node"
+    ASPNETCORE_URLS: "http://*:7071"
     ADD_DUE_DATE_DAYS: "15"
     ADD_RETENTION_DATE_DAYS: "15"
   envSecret:
