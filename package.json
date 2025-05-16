@@ -7,9 +7,8 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc",
-    "watch": "tsc --w",
     "start:host": "func start --javascript",
-    "start": "npm-run-all --parallel start:host watch",
+    "start": "npm-run-all --parallel start:host",
     "test": "jest --coverage --ci --testResultsProcessor jest-sonar-reporter",
     "test:local": "jest --coverage",
     "lint": "eslint -f json -o eslint-report.json . -c .eslintrc.js --ext .ts,.tsx --cache",
