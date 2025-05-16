@@ -68,6 +68,7 @@ microservice-chart:
     ASPNETCORE_URLS: "http://*:7071"
     ADD_DUE_DATE_DAYS: "15"
     ADD_RETENTION_DATE_DAYS: "15"
+    FUNCTIONS_LOG_PATH: "/tmp"
   envSecret:
     APPLICATIONINSIGHTS_CONNECTION_STRING: 'ai-d-connection-string'
   keyvault:

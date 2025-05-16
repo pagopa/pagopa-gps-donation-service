@@ -1,5 +1,5 @@
 FROM node:14.19.0 AS builder
-WORKDIR /app
+WORKDIR /tmp/app
 COPY . .
 RUN yarn global add npm-run-all --non-interactive
 RUN yarn install --frozen-lockfile
@@ -26,7 +26,7 @@ RUN /usr/local/bin/func extensions install
 
 ENV AzureWebJobsScriptRoot=./ \
     AzureFunctionsJobHost__Logging__Console__IsEnabled=true \
-    DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
+    DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1 \
 
 EXPOSE 7071
 ENTRYPOINT ["yarn", "start"]
