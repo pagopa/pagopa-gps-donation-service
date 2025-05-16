@@ -1,15 +1,29 @@
-FROM node:14.19.0
+FROM node:14.19.0-slim AS builder
+WORKDIR /app
+COPY . .
+RUN yarn install --frozen-lockfile
+RUN yarn build
 
+FROM node:14.19.0-slim AS production
 WORKDIR /src/node-function-app
 
-COPY ./ ./
-
 RUN npm i -g azure-functions-core-tools@3 --unsafe-perm true
-RUN yarn install
+
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/host.json ./
+COPY --from=builder /app/local.settings.json ./
+
+COPY --from=builder /app/Donation/function.json ./Donation/
+COPY --from=builder /app/Info/function.json ./Info/
+
+
+COPY package.json yarn.lock ./
+RUN yarn install --production --frozen-lockfile
+
+RUN /usr/local/bin/func extensions install
 
 ENV AzureWebJobsScriptRoot=./ \
     AzureFunctionsJobHost__Logging__Console__IsEnabled=true
 
 EXPOSE 7071
-
 ENTRYPOINT ["yarn", "start"]
