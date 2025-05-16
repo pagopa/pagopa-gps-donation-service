@@ -2,8 +2,8 @@ apiVersion: v2
 name: pagopa-gps-donation-service
 description: Microservice to handle Donations for GPS
 type: application
-version: 1.36.0
-appVersion: 1.1.20-PIDM-491-workload-identity
+version: 1.37.0
+appVersion: 1.1.21-PIDM-491-workload-identity
 dependencies:
   - name: microservice-chart
     version: 7.5.0
