@@ -26,7 +26,7 @@ RUN /usr/local/bin/func extensions install
 
 ENV AzureWebJobsScriptRoot=./ \
     AzureFunctionsJobHost__Logging__Console__IsEnabled=true \
-    DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1 \
+    DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
 
 EXPOSE 7071
 ENTRYPOINT ["yarn", "start"]
